@@ -17,6 +17,7 @@ package org.xmlunit.builder;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.xmlunit.util.Convert.toInputSource;
 import static org.xmlunit.util.Linqy.count;
 
 import org.xmlunit.TestResources;
@@ -570,29 +571,48 @@ public class DiffBuilderTest {
     public void usesDocumentBuilderFactoryWhenNormalizingWhitespace() throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
-        dbf.setValidating(false);
-        dbf.setFeature("http://xml.org/sax/features/validation", false);
+        dbf.setValidating(true);
+        dbf.setFeature("http://xml.org/sax/features/validation", true);
         dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
         dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
         Diff d = DiffBuilder.compare(Input.fromString(
-                     "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \n"
-                     + "     \"http://example.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
-                     + "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-                     + "     <head></head>\n"
-                     + "     <body>some content 1</body>\n"
-                     + "</html>"))
+                     "<!DOCTYPE math PUBLIC \"-//W3C//DTD MATHML 3.0 Transitional//EN\" \n"
+                     + "     \"http://www.w3.org/Math/DTD/mathml3/mathml3.dtd\">\n"
+                     + "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">\n"
+                     + "     <ci>some content 1</ci>\n"
+                     + "</math>"))
             .withTest(Input.fromString(
-                     "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \n"
-                     + "     \"http://example.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
-                     + "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-                     + "     <head></head>\n"
-                     + "     <body>some content 2</body>\n"
-                     + "</html>"))
+                    "<!DOCTYPE math PUBLIC \"-//W3C//DTD MATHML 3.0 Transitional//EN\" \n"
+                            + "     \"http://www.w3.org/Math/DTD/mathml3/mathml3.dtd\">\n"
+                            + "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">\n"
+                            + "     <ci>some content 1</ci>\n"
+                            + "</math>"))
             .withDocumentBuilderFactory(dbf)
             .normalizeWhitespace()
             .build();
-        Assert.assertTrue(d.hasDifferences());
+        Assert.assertFalse(d.hasDifferences());
+    }
+
+    @Test
+    public void isolatedTest() throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        dbf.setValidating(true);
+        dbf.setFeature("http://xml.org/sax/features/validation", true);
+        dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+        Input.Builder builder = Input.fromString(
+                "<!DOCTYPE math PUBLIC \"-//W3C//DTD MATHML 3.0 Transitional//EN\" \n"
+                        + "     \"http://www.w3.org/Math/DTD/mathml3/mathml3.dtd\">\n"
+                        + "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">\n"
+                        + "     <ci>some content 1</ci>\n"
+                        + "</math>");
+
+        dbf.newDocumentBuilder().parse(toInputSource(builder.build()));
+
+
     }
 
     private final class IgnoreAttributeDifferenceEvaluator implements DifferenceEvaluator {

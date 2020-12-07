@@ -24,6 +24,9 @@ public final class TestResources {
     public static final String BOOK_DTD = TEST_RESOURCE_DIR + "Book.dtd";
     public static final String BOOK_XSD = TEST_RESOURCE_DIR + "Book.xsd";
 
+    public static final String MATH_DTD = TEST_RESOURCE_DIR + "mathml3.dtd";
+    public static final String MATH_XSD = TEST_RESOURCE_DIR + "mathml3.xsd";
+
     private TestResources() { }
 
 }

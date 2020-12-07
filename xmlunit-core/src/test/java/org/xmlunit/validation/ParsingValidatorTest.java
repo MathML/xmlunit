@@ -20,6 +20,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.xmlunit.TestResources.BOOK_DTD;
 import static org.xmlunit.TestResources.BOOK_XSD;
+import static org.xmlunit.TestResources.MATH_DTD;
+import static org.xmlunit.TestResources.MATH_XSD;
 import static org.xmlunit.TestResources.TEST_RESOURCE_DIR;
 
 import java.io.File;
@@ -68,6 +70,16 @@ public class ParsingValidatorTest {
         assertFalse(r.getProblems().iterator().hasNext());
     }
 
+    @Test public void shouldSuccessfullyValidateMathSchemaInstance() {
+        ParsingValidator v =
+            new ParsingValidator(Languages.W3C_XML_SCHEMA_NS_URI);
+        v.setSchemaSource(new StreamSource(new File(MATH_XSD)));
+        ValidationResult r = v.validateInstance(new StreamSource(new File(TEST_RESOURCE_DIR
+                                                                          + "MathWithDoctype.xml")));
+        assertTrue(r.isValid());
+        assertFalse(r.getProblems().iterator().hasNext());
+    }
+
     @Test public void shouldFailOnBrokenSchemaInstance() {
         ParsingValidator v =
             new ParsingValidator(Languages.W3C_XML_SCHEMA_NS_URI);
@@ -84,6 +96,16 @@ public class ParsingValidatorTest {
         v.setSchemaSource(new StreamSource(new File(BOOK_DTD)));
         ValidationResult r = v.validateInstance(new StreamSource(new File(TEST_RESOURCE_DIR
                                                                           + "BookWithDoctype.xml")));
+        assertTrue(r.isValid());
+        assertFalse(r.getProblems().iterator().hasNext());
+    }
+
+    @Test public void shouldSuccessfullyValidateMathDTDInstance() {
+        ParsingValidator v =
+                new ParsingValidator(Languages.XML_DTD_NS_URI);
+        v.setSchemaSource(new StreamSource(new File(MATH_DTD)));
+        ValidationResult r = v.validateInstance(new StreamSource(new File(TEST_RESOURCE_DIR
+                + "MathWithDoctype.xml")));
         assertTrue(r.isValid());
         assertFalse(r.getProblems().iterator().hasNext());
     }
